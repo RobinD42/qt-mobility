@@ -18,6 +18,8 @@ moc_*.cpp
 *.idb
 *.ib_pdb_index
 build
+debug
+release
 include/*
 doc/html/*
 doc/qch/*
