@@ -392,7 +392,6 @@ void DirectShowPlayerService::doSetStreamSource(QMutexLocker *locker)
 
 void DirectShowPlayerService::doRender(QMutexLocker *locker)
 {
-	HRESULT hr = S_OK;
     m_pendingTasks |= m_executedTasks & (Play | Pause);
 
     if (IMediaControl *control = com_cast<IMediaControl>(m_graph, IID_IMediaControl)) {
@@ -401,13 +400,13 @@ void DirectShowPlayerService::doRender(QMutexLocker *locker)
     }
 
     if (m_pendingTasks & SetAudioOutput) {
-        hr = m_graph->AddFilter(m_audioOutput, L"AudioOutput");
+        m_graph->AddFilter(m_audioOutput, L"AudioOutput");
 
         m_pendingTasks ^= SetAudioOutput;
         m_executedTasks |= SetAudioOutput;
     }
     if (m_pendingTasks & SetVideoOutput) {
-        hr = m_graph->AddFilter(m_videoOutput, L"VideoOutput");
+        m_graph->AddFilter(m_videoOutput, L"VideoOutput");
 
         m_pendingTasks ^= SetVideoOutput;
         m_executedTasks |= SetVideoOutput;
@@ -582,8 +581,6 @@ void DirectShowPlayerService::releaseGraph()
 void DirectShowPlayerService::doReleaseGraph(QMutexLocker *locker)
 {
     Q_UNUSED(locker);
-    HRESULT hr;
-	ULONG ref; 
 
     if (IMediaControl *control = com_cast<IMediaControl>(m_graph, IID_IMediaControl)) {
         control->Stop();
@@ -591,13 +588,13 @@ void DirectShowPlayerService::doReleaseGraph(QMutexLocker *locker)
     }
 
     if (m_source) {
-        ref = m_source->Release();
+        m_source->Release();
         m_source = 0;
     }
 
     m_eventHandle = 0;
 
-    ref = m_graph->Release();
+    m_graph->Release();
     m_graph = 0;
 
     m_loop->wake();
