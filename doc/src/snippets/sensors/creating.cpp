@@ -42,6 +42,7 @@
 #include <QWidget>
 #include <qaccelerometer.h>
 #include <qorientationsensor.h>
+#include <qmagnetometer.h>
 
 QTM_USE_NAMESPACE
 
