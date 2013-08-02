@@ -288,15 +288,18 @@ HRESULT VideoSurfaceFilter::ReceiveConnection(IPin *pConnector, const AM_MEDIA_T
             m_surfaceFormat = DirectShowMediaType::formatFromType(*pmt);
             m_bytesPerLine = DirectShowMediaType::bytesPerLine(m_surfaceFormat);
 
-            if (thread() == QThread::currentThread()) {
+            // It doesn't hurt in this case to allow start() to run in a non-UI 
+            // thread, and this is a common deadlock point so just avoid that whole
+            // issue too.
+            //if (thread() == QThread::currentThread()) {
                 hr = start();
-            } else {
-                m_loop->postEvent(this, new QEvent(QEvent::Type(StartSurface)));
-
-                m_wait.wait(&m_mutex);
-
-                hr = m_startResult;
-            }
+            //} else {
+            //    m_loop->postEvent(this, new QEvent(QEvent::Type(StartSurface)));
+            //
+            //    m_wait.wait(&m_mutex);
+            //
+            //    hr = m_startResult;
+            //}
         }
         if (hr == S_OK) {
            m_peerPin = pConnector;

@@ -867,7 +867,9 @@ qint64 DirectShowPlayerService::position() const
     QMutexLocker locker(const_cast<QMutex *>(&m_mutex));
 
     if (m_graphStatus == Loaded) {
-        if (m_executingTask == Seek || m_executingTask == SetRate || (m_pendingTasks & Seek)) {
+        // Don't try to fetch the position if there is a Seek or Render happening or pending
+        if (m_executingTask == Seek || m_executingTask == SetRate || m_executingTask == Render 
+            || (m_pendingTasks & (Seek|Render))) {
             return m_position;
         } else if (IMediaSeeking *seeking = com_cast<IMediaSeeking>(m_graph, IID_IMediaSeeking)) {
             LONGLONG position = 0;
